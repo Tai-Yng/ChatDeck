@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "ChatDeck",
+  "version": "0.1.0",
+  "description": "Floating navigator for your AI chat history. Browse Q&A pairs without scrolling.",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://chat.deepseek.com/*",
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://kimi.com/*",
+    "https://kimi.moonshot.cn/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.deepseek.com/*",
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://kimi.com/*",
+        "https://kimi.moonshot.cn/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": [
+        "adapters/registry.js",
+        "adapters/deepseek.js",
+        "adapters/chatgpt.js",
+        "adapters/claude.js",
+        "adapters/gemini.js",
+        "adapters/kimi.js",
+        "core/storage.js",
+        "core/capture.js",
+        "core/manager.js",
+        "core/content.js"
+      ],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup/popup.html", "default_title": "ChatDeck" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
