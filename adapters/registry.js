@@ -41,6 +41,8 @@
     isNewChat() { return false; },
     extractContent,
     findQuestion,
+    // 悬浮窗富渲染的克隆来源：默认整条回答元素；平台可收窄（如 DeepSeek 只取正文 markdown）
+    renderSource(answerEl) { return answerEl; },
   };
 
   const adapters = [];

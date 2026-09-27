@@ -72,6 +72,20 @@ describe('ChatDeckManager', () => {
     expect(document.querySelector('.chatdeck-content').textContent).toContain('A2');
     expect(document.querySelector('.chatdeck-count').textContent).toContain('2 / 2');
   });
+  it('富渲染：克隆消毒保留结构、剥 script/button、mermaid 优雅降级', async () => {
+    document.body.innerHTML = `<div id="src"><h2>标题甲</h2><p>段落文字</p><script>window.evil=1</script><button>复制</button><img src="https://x.test/a.png"><pre><code class="language-mermaid">graph TD; A-->B</code></pre></div>`;
+    const cap = fakeCapture();
+    cap.currentIndex = 0;
+    cap.responses = [{ question: 'Q', answer: '', node: document.getElementById('src'), capturedAt: 0 }];
+    const m = new ChatDeckManager(cap, fakeStore(), { label: 'Fake' });
+    await m.init();
+    const c = document.querySelector('.chatdeck-content');
+    expect(c.querySelector('h2').textContent).toBe('标题甲');
+    expect(c.querySelector('img')).toBeTruthy();
+    expect(c.querySelector('script')).toBeNull();          // 消毒：脚本剥离
+    expect(c.querySelector('button')).toBeNull();          // 消毒：按钮剥离
+    expect(c.querySelector('code.language-mermaid')).toBeTruthy(); // jsdom 无 chrome → 库不加载，代码块保留
+  });
   it('toggle 显隐', async () => {
     const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
     await m.init(); m.hide();
@@ -89,5 +103,10 @@ describe('styles.css 命名空间（Review Focus #1）', () => {
     const sels = noComments.split('}').map(s => s.split('{')[0].trim()).filter(Boolean);
     expect(sels.length).toBeGreaterThan(5);
     sels.forEach(s => expect(s.split(',')[0].trim().startsWith('.chatdeck'), `违规选择器: ${s}`).toBe(true));
+  });
+  it('图片默认居中（用户 LX.15 同款要求）', async () => {
+    const fs = await import('node:fs');
+    const css = fs.readFileSync('styles.css', 'utf8');
+    expect(css.includes('.chatdeck-content img {')).toBe(true);
   });
 });

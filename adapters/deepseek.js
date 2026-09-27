@@ -38,5 +38,10 @@
       const md = answerEl && answerEl.querySelector(':scope > .ds-markdown');
       return ChatDeck.DefaultAdapter.extractContent.call(this, md || answerEl);
     },
+
+    // 富渲染同样只克隆正文 markdown（排除思考块与操作按钮条）
+    renderSource(answerEl) {
+      return (answerEl && answerEl.querySelector(':scope > .ds-markdown')) || answerEl;
+    },
   });
 })();

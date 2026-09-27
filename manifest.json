@@ -42,6 +42,20 @@
   ],
   "background": { "service_worker": "background.js" },
   "action": { "default_popup": "popup/popup.html", "default_title": "ChatDeck" },
+  "web_accessible_resources": [
+    {
+      "resources": ["vendor/mermaid.min.js"],
+      "matches": [
+        "https://chat.deepseek.com/*",
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://kimi.com/*",
+        "https://kimi.moonshot.cn/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
+      ]
+    }
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
