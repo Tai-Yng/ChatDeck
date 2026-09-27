@@ -37,6 +37,8 @@
           <div class="chatdeck-content"></div>
         </div>
         <div class="chatdeck-footer">
+          <button class="chatdeck-btn chatdeck-copy" aria-label="复制本条回答">⧉ 复制</button>
+          <span class="chatdeck-footer-spacer"></span>
           <button class="chatdeck-btn chatdeck-prev" aria-label="上一条">←</button>
           <button class="chatdeck-btn chatdeck-next" aria-label="下一条">→</button>
         </div>
@@ -46,6 +48,7 @@
       this.root.querySelector('.chatdeck-close').onclick = () => this.hide();
       this.root.querySelector('.chatdeck-prev').onclick = () => this.prev();
       this.root.querySelector('.chatdeck-next').onclick = () => this.next();
+      this.root.querySelector('.chatdeck-copy').onclick = () => this._copyCurrent();
       this._enableDrag();
       this._enableResize();
     }
@@ -160,6 +163,35 @@
         });
       }
       return this._mermaidPromise;
+    }
+
+    async _copyCurrent() {
+      const cur = this.capture.responses[this.capture.currentIndex];
+      if (!cur || !cur.answer) return;
+      const ok = await this._writeClipboard(cur.answer);
+      const btn = this.root.querySelector('.chatdeck-copy');
+      if (!btn) return;
+      btn.textContent = ok ? '✓ 已复制' : '✗ 失败';
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = '⧉ 复制'; btn.disabled = false; }, 1200);
+    }
+
+    async _writeClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+          document.documentElement.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          ta.remove();
+          return ok;
+        } catch { return false; }
+      }
     }
 
     async _renderMermaid(cEl) {

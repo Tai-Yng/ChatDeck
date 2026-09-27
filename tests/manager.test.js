@@ -86,6 +86,30 @@ describe('ChatDeckManager', () => {
     expect(c.querySelector('button')).toBeNull();          // 消毒：按钮剥离
     expect(c.querySelector('code.language-mermaid')).toBeTruthy(); // jsdom 无 chrome → 库不加载，代码块保留
   });
+  it('复制按钮把当前回答写入剪贴板并给出反馈', async () => {
+    const writeText = vi.fn().mockResolvedValue();
+    Object.defineProperty(window.navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const cap = fakeCapture(); cap.currentIndex = -1;   // 默认选中最新一条
+    const m = new ChatDeckManager(cap, fakeStore(), { label: 'Fake' });
+    await m.init();
+    const btn = document.querySelector('.chatdeck-copy');
+    expect(btn).toBeTruthy();
+    await m._copyCurrent();
+    expect(writeText).toHaveBeenCalledWith('A2');
+    expect(btn.textContent).toBe('✓ 已复制');
+  });
+  it('剪贴板 API 失败时降级 execCommand', async () => {
+    Object.defineProperty(window.navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) }, configurable: true });
+    const exec = vi.fn(() => true);
+    Object.defineProperty(document, 'execCommand', { value: exec, configurable: true });
+    const cap = fakeCapture(); cap.currentIndex = 0;
+    const m = new ChatDeckManager(cap, fakeStore(), { label: 'Fake' });
+    await m.init();
+    await expect(m._writeClipboard('内容')).resolves.toBe(true);
+    expect(exec).toHaveBeenCalledWith('copy');
+    delete document.execCommand;
+  });
   it('toggle 显隐', async () => {
     const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
     await m.init(); m.hide();
