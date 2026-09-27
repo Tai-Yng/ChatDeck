@@ -105,8 +105,9 @@
 
     sync() {
       const n = this.capture.responses.length;
-      this.root.querySelector('.chatdeck-count').textContent = `${n ? this.capture.currentIndex + 1 : 0} / ${n}`;
       if (this.capture.currentIndex >= n) this.capture.currentIndex = n - 1;
+      if (n && this.capture.currentIndex < 0) this.capture.currentIndex = n - 1; // 初始/重置后默认展示最新一条
+      this.root.querySelector('.chatdeck-count').textContent = `${n ? this.capture.currentIndex + 1 : 0} / ${n}`;
       const cur = this.capture.responses[this.capture.currentIndex];
       const qEl = this.root.querySelector('.chatdeck-question');
       const cEl = this.root.querySelector('.chatdeck-content');

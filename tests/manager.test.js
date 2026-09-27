@@ -64,6 +64,14 @@ describe('ChatDeckManager', () => {
     await m.init();
     expect(m.root.classList.contains('chatdeck-dark')).toBe(true);
   });
+  it('捕获后 currentIndex=-1 → 自动展示最新一条（真站回归：窗口不再空白）', async () => {
+    const cap = fakeCapture();
+    cap.currentIndex = -1;                       // capture.scan() 首轮回溯后的真实状态
+    const m = new ChatDeckManager(cap, fakeStore(), { label: 'Fake' });
+    await m.init();
+    expect(document.querySelector('.chatdeck-content').textContent).toContain('A2');
+    expect(document.querySelector('.chatdeck-count').textContent).toContain('2 / 2');
+  });
   it('toggle 显隐', async () => {
     const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
     await m.init(); m.hide();
