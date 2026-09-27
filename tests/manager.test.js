@@ -110,6 +110,35 @@ describe('ChatDeckManager', () => {
     expect(exec).toHaveBeenCalledWith('copy');
     delete document.execCommand;
   });
+  it('收齐历史按钮触发捕获器行走并反馈结果', async () => {
+    vi.useFakeTimers();
+    let walked = 0;
+    let releaseWalk;
+    const cap = fakeCapture(); cap.currentIndex = 0;
+    cap.walkHistory = () => new Promise(r => {
+      releaseWalk = () => {
+        walked++;
+        cap.responses.push({ question: 'Q3', answer: 'A3 完整内容', node: null, capturedAt: 0 });
+        r();
+      };
+    });
+    const m = new ChatDeckManager(cap, fakeStore(), { label: 'Fake' });
+    await m.init();
+    const btn = document.querySelector('.chatdeck-walk');
+    expect(btn).toBeTruthy();
+    const p = m._walkAll();
+    await vi.advanceTimersByTimeAsync(400);   // 行走进行中：进度刷新一拍
+    expect(btn.textContent).toContain('收集中');
+    expect(btn.disabled).toBe(true);
+    releaseWalk();
+    await p;
+    expect(walked).toBe(1);
+    expect(btn.textContent).toContain('已收齐');
+    await vi.advanceTimersByTimeAsync(1300);  // 反馈还原
+    expect(btn.textContent).toBe('⇡ 收齐历史');
+    expect(btn.disabled).toBe(false);
+    vi.useRealTimers();
+  });
   it('toggle 显隐', async () => {
     const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
     await m.init(); m.hide();

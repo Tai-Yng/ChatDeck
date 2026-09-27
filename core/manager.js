@@ -38,6 +38,7 @@
         </div>
         <div class="chatdeck-footer">
           <button class="chatdeck-btn chatdeck-copy" aria-label="复制本条回答">⧉ 复制</button>
+          <button class="chatdeck-btn chatdeck-walk" aria-label="滚动收齐全部历史">⇡ 收齐历史</button>
           <span class="chatdeck-footer-spacer"></span>
           <button class="chatdeck-btn chatdeck-prev" aria-label="上一条">←</button>
           <button class="chatdeck-btn chatdeck-next" aria-label="下一条">→</button>
@@ -49,6 +50,7 @@
       this.root.querySelector('.chatdeck-prev').onclick = () => this.prev();
       this.root.querySelector('.chatdeck-next').onclick = () => this.next();
       this.root.querySelector('.chatdeck-copy').onclick = () => this._copyCurrent();
+      this.root.querySelector('.chatdeck-walk').onclick = () => this._walkAll();
       this._enableDrag();
       this._enableResize();
     }
@@ -163,6 +165,24 @@
         });
       }
       return this._mermaidPromise;
+    }
+
+    // 手动收齐历史：触发捕获器滚动行走（仅虚拟列表平台有效），按钮显示进度与结果
+    async _walkAll() {
+      const btn = this.root.querySelector('.chatdeck-walk');
+      if (!btn || btn.disabled) return;
+      btn.disabled = true;
+      const timer = setInterval(() => { btn.textContent = `收集中… ${this.capture.responses.length}`; }, 300);
+      try {
+        await this.capture.walkHistory();
+        btn.textContent = `✓ 已收齐 ${this.capture.responses.length}`;
+      } catch (e) {
+        ChatDeck.warn('收齐历史失败', e);
+        btn.textContent = '✗ 失败';
+      } finally {
+        clearInterval(timer);
+        setTimeout(() => { btn.textContent = '⇡ 收齐历史'; btn.disabled = false; }, 1200);
+      }
     }
 
     async _copyCurrent() {

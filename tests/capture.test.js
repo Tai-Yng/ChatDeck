@@ -99,11 +99,11 @@ describe('ChatDeckCapture', () => {
     expect(c.responses[0].answer).toContain('重新生成');
     expect(c.responses[1].answer).toBe('消息二的完整内容');
   });
-  it('自动行走：滚动容器存在时收齐历史并恢复滚动位置', async () => {
+  it('滚动收齐：滚动容器存在时收齐历史并恢复滚动位置（手动触发）', async () => {
     vi.useFakeTimers();
     const host = { scrollTop: 100, clientHeight: 100, scrollHeight: 300 };
     const c = new ChatDeckCapture(makeAdapter({ getScrollContainer: () => host }), { onUpdate: vi.fn() });
-    const p = c._walkHistory();
+    const p = c.walkHistory();
     await vi.advanceTimersByTimeAsync(1000);
     await p;
     expect(host.scrollTop).toBe(100);   // 走完恢复原位

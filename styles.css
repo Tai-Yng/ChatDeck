@@ -34,7 +34,7 @@
 .chatdeck-footer { display: flex; gap: 6px; padding: 6px 10px; border-top: 1px solid #e5e7eb;
   background: #f8fafc; align-items: center; }
 .chatdeck-footer-spacer { flex: 1 1 0%; }
-.chatdeck-copy { font-size: 12.5px; }
+.chatdeck-copy, .chatdeck-walk { font-size: 12.5px; }
 .chatdeck-resize { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
   cursor: nwse-resize; border-right: 3px solid #cbd5e1; border-bottom: 3px solid #cbd5e1;
   border-bottom-right-radius: 12px; }

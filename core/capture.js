@@ -159,9 +159,9 @@
       this.emit();
     }
 
-    // 虚拟列表平台的自动上滚行走：切换会话后从底部逐步滚到顶，
+    // 虚拟列表平台的滚动收齐（用户从悬浮窗手动触发）：从当前位置上滚到顶，
     // 每步触发一次合并回溯，收齐全部历史后恢复原滚动位置。平台无虚拟列表（钩子返回 null）则跳过。
-    async _walkHistory() {
+    async walkHistory() {
       if (this._walking) return;
       const host = this.safeCall('getScrollContainer');
       if (!host || typeof host.scrollTop !== 'number') return;
@@ -188,8 +188,7 @@
       if (location.href !== this.lastHref) {
         this.lastHref = location.href;
         this.responses = []; this.nodeMap = new WeakMap(); this.currentIndex = -1;
-        this.fullRescan();
-        this._walkHistory();          // 切换会话：可见区先上屏，随后自动行走补全全部历史
+        this.fullRescan();   // 可见区先上屏；用户正常滚动时合并式捕获持续累积
         return;
       }
       if (this.safeCall('isNewChat') && this.responses.length) {
