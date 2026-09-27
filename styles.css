@@ -1,50 +1,141 @@
-/* styles.css —— 命名空间样式；宿主页面不得受影响，窗口不得受宿主影响 */
-.chatdeck-root { position: fixed; z-index: 2147483647; background: #fff; color: #1f2937;
-  border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.18);
-  font: 14px/1.5 system-ui, sans-serif; display: flex; flex-direction: column; min-width: 320px; min-height: 240px; }
-.chatdeck-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  cursor: move; user-select: none; border-bottom: 1px solid #e5e7eb; background: #f9fafb;
-  border-radius: 12px 12px 0 0; }
-.chatdeck-title { font-weight: 600; flex: 1; }
-.chatdeck-count { font-size: 12px; color: #6b7280; }
+/* styles.css —— ChatDeck 悬浮窗完整主题
+   命名空间铁律：每条规则以 .chatdeck 开头（tests/manager.test.js lint 钉住）。
+   内容区规则用 .chatdeck-root 前缀提权，压过宿主页 hash 类样式，保证五平台观感一致。 */
+
+/* ================= 窗口骨架 ================= */
+.chatdeck-root { position: fixed; z-index: 2147483647; background: #ffffff; color: #1f2937;
+  border: 1px solid #e5e7eb; border-radius: 14px; box-shadow: 0 12px 40px rgba(15,23,42,.22), 0 2px 8px rgba(15,23,42,.10);
+  font: 14px/1.6 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  display: flex; flex-direction: column; min-width: 320px; min-height: 240px; overflow: hidden; }
+
+.chatdeck-header { display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+  cursor: move; user-select: none; background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+  border-bottom: 1px solid #e5e7eb; }
+.chatdeck-title { font-weight: 600; flex: 1; font-size: 13px; letter-spacing: .2px;
+  color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chatdeck-count { font-size: 11.5px; color: #2563eb; background: rgba(37,99,235,.10);
+  padding: 1px 9px; border-radius: 999px; font-variant-numeric: tabular-nums; }
 .chatdeck-btn { border: none; background: transparent; cursor: pointer; font-size: 14px;
-  color: inherit; padding: 2px 8px; border-radius: 6px; }
-.chatdeck-btn:hover { background: rgba(0,0,0,.08); }
-.chatdeck-btn:disabled { opacity: .35; cursor: default; }
-.chatdeck-body { flex: 1; overflow: auto; padding: 10px 14px; }
-.chatdeck-question { font-weight: 600; margin-bottom: 8px; padding-bottom: 8px;
-  border-bottom: 1px dashed #e5e7eb; white-space: pre-wrap; }
-.chatdeck-content { white-space: pre-wrap; word-break: break-word; }
-.chatdeck-footer { display: flex; gap: 8px; padding: 6px 12px; border-top: 1px solid #e5e7eb; }
+  color: #475569; padding: 3px 10px; border-radius: 8px; line-height: 1.4;
+  transition: background .15s ease, color .15s ease; }
+.chatdeck-btn:hover { background: rgba(15,23,42,.08); color: #1e293b; }
+.chatdeck-btn:disabled { opacity: .32; cursor: default; }
+.chatdeck-btn:disabled:hover { background: transparent; }
+
+.chatdeck-body { flex: 1; overflow: auto; padding: 12px 16px 16px; }
+
+.chatdeck-question { font-weight: 500; font-size: 13.5px; margin: 0 0 10px; padding: 6px 10px;
+  border-left: 3px solid #2563eb; background: rgba(37,99,235,.05); border-radius: 0 8px 8px 0;
+  white-space: pre-wrap; max-height: 104px; overflow: auto; color: #334155; }
+
+.chatdeck-content { white-space: normal; overflow-wrap: break-word; }
+.chatdeck-content--plain { white-space: pre-wrap; }
+
+.chatdeck-footer { display: flex; gap: 6px; padding: 6px 10px; border-top: 1px solid #e5e7eb;
+  background: #f8fafc; }
 .chatdeck-resize { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
   cursor: nwse-resize; border-right: 3px solid #cbd5e1; border-bottom: 3px solid #cbd5e1;
   border-bottom-right-radius: 12px; }
-.chatdeck-dark.chatdeck-root { background: #1e293b; color: #e2e8f0; border-color: #334155; }
-.chatdeck-dark .chatdeck-header { background: #0f172a; border-color: #334155; }
-.chatdeck-dark .chatdeck-question { border-color: #334155; }
-.chatdeck-dark .chatdeck-btn:hover { background: rgba(255,255,255,.12); }
-/* ---- 富文本内容排版（克隆宿主 DOM 后的归一化补充） ---- */
-.chatdeck-content p { margin: .5em 0; }
-.chatdeck-content h1, .chatdeck-content h2, .chatdeck-content h3,
-.chatdeck-content h4, .chatdeck-content h5, .chatdeck-content h6 { margin: .9em 0 .4em; line-height: 1.3; }
-.chatdeck-content ul, .chatdeck-content ol { padding-left: 1.4em; margin: .5em 0; }
-.chatdeck-content li { margin: .2em 0; }
-.chatdeck-content pre { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px;
-  padding: 10px 12px; overflow: auto; white-space: pre; margin: .6em 0; }
-.chatdeck-content code { font-family: ui-monospace, Consolas, "Courier New", monospace; font-size: .92em; }
-.chatdeck-content :not(pre) > code { background: rgba(0,0,0,.06); border-radius: 4px; padding: 1px 5px; }
-.chatdeck-content table { border-collapse: collapse; margin: .6em 0; max-width: 100%; }
-.chatdeck-content th, .chatdeck-content td { border: 1px solid #e5e7eb; padding: 4px 10px; text-align: left; }
-.chatdeck-content img { display: block; margin: .6em auto; max-width: 100%; border-radius: 6px; }
-.chatdeck-content blockquote { border-left: 3px solid #cbd5e1; margin: .6em 0; padding: .1em .9em; color: #6b7280; }
-.chatdeck-content a { color: #2563eb; }
-.chatdeck-content hr { border: none; border-top: 1px solid #e5e7eb; margin: 1em 0; }
-.chatdeck-content--plain { white-space: pre-wrap; }
-.chatdeck-mermaid { text-align: center; margin: .8em 0; overflow-x: auto; }
-.chatdeck-mermaid svg { max-width: 100%; }
-.chatdeck-dark .chatdeck-content pre { background: #0f172a; border-color: #334155; }
-.chatdeck-dark .chatdeck-content :not(pre) > code { background: rgba(255,255,255,.1); }
-.chatdeck-dark .chatdeck-content th, .chatdeck-dark .chatdeck-content td { border-color: #334155; }
-.chatdeck-dark .chatdeck-content blockquote { border-color: #475569; color: #94a3b8; }
-.chatdeck-dark .chatdeck-content a { color: #60a5fa; }
-.chatdeck-dark .chatdeck-content hr { border-top-color: #334155; }
+
+/* ================= 滚动条 ================= */
+.chatdeck-root ::-webkit-scrollbar { width: 8px; height: 8px; }
+.chatdeck-root ::-webkit-scrollbar-track { background: transparent; }
+.chatdeck-root ::-webkit-scrollbar-thumb { background: rgba(100,116,139,.35); border-radius: 4px; }
+.chatdeck-root ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,.55); }
+
+/* ================= 正文排版（提权压宿主样式） ================= */
+.chatdeck-root .chatdeck-content { font-size: 14px !important; line-height: 1.75 !important; }
+
+/* 标题：GitHub 式层级，h2 以下带底衬线 */
+.chatdeck-root .chatdeck-content h1 { font-size: 1.45em !important; font-weight: 700 !important;
+  margin: 1.1em 0 .5em !important; padding-bottom: .25em; border-bottom: 1px solid #e5e7eb; line-height: 1.3 !important; }
+.chatdeck-root .chatdeck-content h2 { font-size: 1.25em !important; font-weight: 700 !important;
+  margin: 1em 0 .45em !important; padding-bottom: .2em; border-bottom: 1px solid #f1f5f9; line-height: 1.3 !important; }
+.chatdeck-root .chatdeck-content h3 { font-size: 1.1em !important; font-weight: 650 !important; margin: .9em 0 .4em !important; line-height: 1.3 !important; }
+.chatdeck-root .chatdeck-content h4, .chatdeck-root .chatdeck-content h5, .chatdeck-root .chatdeck-content h6
+  { font-size: 1em !important; font-weight: 650 !important; margin: .8em 0 .35em !important; }
+.chatdeck-root .chatdeck-content h1:first-child, .chatdeck-root .chatdeck-content h2:first-child,
+.chatdeck-root .chatdeck-content h3:first-child { margin-top: 0 !important; }
+.chatdeck-root .chatdeck-content p { margin: .55em 0 !important; }
+
+/* 列表 */
+.chatdeck-root .chatdeck-content ul, .chatdeck-root .chatdeck-content ol { padding-left: 1.5em !important; margin: .5em 0 !important; }
+.chatdeck-root .chatdeck-content li { margin: .25em 0 !important; }
+.chatdeck-root .chatdeck-content li > ul, .chatdeck-root .chatdeck-content li > ol { margin: .2em 0 !important; }
+.chatdeck-root .chatdeck-content li::marker { color: #64748b; }
+
+/* 行内与引用 */
+.chatdeck-root .chatdeck-content strong { font-weight: 650 !important; }
+.chatdeck-root .chatdeck-content blockquote { border-left: 3px solid #93c5fd; background: rgba(37,99,235,.04);
+  margin: .7em 0 !important; padding: .35em .9em !important; color: #475569 !important; border-radius: 0 8px 8px 0; }
+.chatdeck-root .chatdeck-content a { color: #2563eb !important; text-decoration: none; }
+.chatdeck-root .chatdeck-content a:hover { text-decoration: underline; }
+.chatdeck-root .chatdeck-content hr { border: none; border-top: 1px solid #e5e7eb !important; margin: 1.1em 0 !important; }
+
+/* 行内代码：药丸样式 */
+.chatdeck-root .chatdeck-content :not(pre) > code { background: rgba(15,23,42,.06) !important;
+  border: 1px solid rgba(15,23,42,.08); border-radius: 5px; padding: 1px 6px !important;
+  font-family: ui-monospace, "Cascadia Code", Consolas, "Courier New", monospace !important;
+  font-size: .88em !important; color: #be185d !important; white-space: pre-wrap; }
+
+/* 代码块：编辑器风 */
+.chatdeck-root .chatdeck-content pre { background: #f6f8fa !important; border: 1px solid #e2e8f0 !important;
+  border-radius: 10px; padding: 12px 14px !important; margin: .7em 0 !important;
+  overflow: auto; white-space: pre !important; }
+.chatdeck-root .chatdeck-content pre code { background: transparent !important; border: none !important;
+  padding: 0 !important; color: #1f2328 !important; font-size: 12.5px !important; line-height: 1.6 !important;
+  font-family: ui-monospace, "Cascadia Code", Consolas, "Courier New", monospace !important; }
+
+/* 表格：圆角外框 + 斑马纹 + 悬停 */
+.chatdeck-root .chatdeck-content table { border-collapse: separate !important; border-spacing: 0 !important;
+  margin: .8em 0 !important; max-width: 100%; display: block; overflow-x: auto;
+  border: 1px solid #e2e8f0 !important; border-radius: 10px; font-size: .93em; }
+.chatdeck-root .chatdeck-content th { background: #f1f5f9 !important; font-weight: 650 !important;
+  color: #334155 !important; white-space: nowrap; }
+.chatdeck-root .chatdeck-content th, .chatdeck-root .chatdeck-content td
+  { border: none !important; border-bottom: 1px solid #e2e8f0 !important; border-right: 1px solid #e2e8f0 !important;
+    padding: 6px 12px !important; text-align: left !important; vertical-align: top; }
+.chatdeck-root .chatdeck-content th:last-child, .chatdeck-root .chatdeck-content td:last-child { border-right: none !important; }
+.chatdeck-root .chatdeck-content tr:last-child td { border-bottom: none !important; }
+.chatdeck-root .chatdeck-content tbody tr:nth-child(even) { background: rgba(15,23,42,.025); }
+.chatdeck-root .chatdeck-content tbody tr:hover { background: rgba(37,99,235,.06); }
+
+/* 图片：默认居中（LX.15 同款），圆角淡影 */
+.chatdeck-root .chatdeck-content img { display: block !important; margin: .8em auto !important;
+  max-width: 100% !important; border-radius: 8px; box-shadow: 0 2px 10px rgba(15,23,42,.12); }
+
+/* mermaid 图容器 */
+.chatdeck-mermaid { text-align: center; margin: .9em 0 !important; overflow-x: auto; padding: 4px 0; }
+.chatdeck-mermaid svg { max-width: 100% !important; height: auto !important; }
+
+/* ================= 深色主题 ================= */
+.chatdeck-dark.chatdeck-root { background: #0f172a; color: #e2e8f0;
+  border-color: #334155; box-shadow: 0 12px 40px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35); }
+.chatdeck-dark .chatdeck-header { background: linear-gradient(180deg, #1e293b, #172033); border-bottom-color: #334155; }
+.chatdeck-dark .chatdeck-title { color: #cbd5e1; }
+.chatdeck-dark .chatdeck-count { color: #60a5fa; background: rgba(96,165,250,.12); }
+.chatdeck-dark .chatdeck-btn { color: #94a3b8; }
+.chatdeck-dark .chatdeck-btn:hover { background: rgba(148,163,184,.14); color: #e2e8f0; }
+.chatdeck-dark .chatdeck-question { border-left-color: #60a5fa; background: rgba(96,165,250,.08); color: #cbd5e1; }
+.chatdeck-dark .chatdeck-footer { background: #172033; border-top-color: #334155; }
+.chatdeck-dark .chatdeck-resize { border-color: #475569; }
+.chatdeck-dark ::-webkit-scrollbar-thumb { background: rgba(71,85,105,.6); }
+
+.chatdeck-dark .chatdeck-content h1 { border-bottom-color: #334155; }
+.chatdeck-dark .chatdeck-content h2 { border-bottom-color: #1e293b; }
+.chatdeck-dark .chatdeck-content li::marker { color: #64748b; }
+.chatdeck-dark .chatdeck-content blockquote { border-left-color: #3b82f6;
+  background: rgba(59,130,246,.08); color: #94a3b8 !important; }
+.chatdeck-dark .chatdeck-content a { color: #60a5fa !important; }
+.chatdeck-dark .chatdeck-content hr { border-top-color: #334155 !important; }
+.chatdeck-dark .chatdeck-content :not(pre) > code
+  { background: rgba(148,163,184,.14) !important; border-color: rgba(148,163,184,.18); color: #f9a8d4 !important; }
+.chatdeck-dark .chatdeck-content pre { background: #0b1222 !important; border-color: #1e293b !important; }
+.chatdeck-dark .chatdeck-content pre code { color: #dbe4f3 !important; }
+.chatdeck-dark .chatdeck-content table { border-color: #334155 !important; }
+.chatdeck-dark .chatdeck-content th { background: #1e293b !important; color: #cbd5e1 !important; }
+.chatdeck-dark .chatdeck-content th, .chatdeck-dark .chatdeck-content td
+  { border-bottom-color: #293548 !important; border-right-color: #293548 !important; }
+.chatdeck-dark .chatdeck-content tbody tr:nth-child(even) { background: rgba(148,163,184,.05); }
+.chatdeck-dark .chatdeck-content tbody tr:hover { background: rgba(96,165,250,.09); }
+.chatdeck-dark .chatdeck-content img { box-shadow: 0 2px 12px rgba(0,0,0,.5); }
