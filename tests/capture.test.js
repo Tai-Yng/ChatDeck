@@ -69,6 +69,46 @@ describe('ChatDeckCapture', () => {
     vi.advanceTimersByTime(3100);
     expect(c.responses.length).toBe(2);
   });
+  it('合并回溯：分批出现的消息累积而非替换（虚拟列表场景）', () => {
+    const c = new ChatDeckCapture(makeAdapter(), { onUpdate: vi.fn() });
+    setDom(`<div class="ans">消息四的完整内容</div><div class="ans">消息五的完整内容</div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    expect(c.responses.map(r => r.answer)).toEqual(['消息四的完整内容', '消息五的完整内容']);
+    setDom(`<div class="ans">消息二的完整内容</div><div class="ans">消息三的完整内容</div><div class="ans">消息四的完整内容</div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    expect(c.responses.map(r => r.answer)).toEqual(['消息二的完整内容', '消息三的完整内容', '消息四的完整内容', '消息五的完整内容']);
+    setDom(`<div class="ans">消息一的完整内容</div><div class="ans">消息二的完整内容</div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    expect(c.responses.map(r => r.answer)).toEqual(['消息一的完整内容', '消息二的完整内容', '消息三的完整内容', '消息四的完整内容', '消息五的完整内容']);
+  });
+  it('合并回溯：末尾新消息追加在正确位置', () => {
+    const c = new ChatDeckCapture(makeAdapter(), { onUpdate: vi.fn() });
+    setDom(`<div class="ans">消息一的完整内容</div><div class="ans">消息二的完整内容</div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    setDom(`<div class="ans">消息二的完整内容</div><div class="ans">消息三的完整内容</div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    expect(c.responses.map(r => r.answer)).toEqual(['消息一的完整内容', '消息二的完整内容', '消息三的完整内容']);
+  });
+  it('合并回溯：同问题+旧节点已卸载 → 原位替换（重新生成重挂载）', () => {
+    const c = new ChatDeckCapture(makeAdapter(), { onUpdate: vi.fn() });
+    setDom(`<div><div class="q">问题甲</div><div class="ans" id="n1">消息一的完整内容</div></div><div><div class="q">问题乙</div><div class="ans">消息二的完整内容</div></div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    setDom(`<div><div class="q">问题甲</div><div class="ans" id="n1">重新生成的全新内容完全不同</div></div><div><div class="q">问题乙</div><div class="ans">消息二的完整内容</div></div>`);
+    c.fullRescan(); vi.advanceTimersByTime(50);
+    expect(c.responses.length).toBe(2);
+    expect(c.responses[0].answer).toContain('重新生成');
+    expect(c.responses[1].answer).toBe('消息二的完整内容');
+  });
+  it('自动行走：滚动容器存在时收齐历史并恢复滚动位置', async () => {
+    vi.useFakeTimers();
+    const host = { scrollTop: 100, clientHeight: 100, scrollHeight: 300 };
+    const c = new ChatDeckCapture(makeAdapter({ getScrollContainer: () => host }), { onUpdate: vi.fn() });
+    const p = c._walkHistory();
+    await vi.advanceTimersByTimeAsync(1000);
+    await p;
+    expect(host.scrollTop).toBe(100);   // 走完恢复原位
+    vi.useRealTimers();
+  });
   it('200 节点回溯分批完成、不抛错（Review Focus #2）', () => {
     setDom(Array.from({ length: 200 }, (_, i) => `<div class="ans">A${i}</div>`).join(''));
     const c = new ChatDeckCapture(makeAdapter(), { onUpdate: vi.fn() });

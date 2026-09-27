@@ -33,6 +33,11 @@
     // 新对话页 URL 为 /，会话页为 /a/chat/s/<id>
     isNewChat() { return location.pathname === '/'; },
 
+    // 消息列表为虚拟列表：返回滚动容器供捕获器自动上滚收齐历史
+    getScrollContainer() {
+      return document.querySelector('.ds-virtual-list');
+    },
+
     // 只取正文 markdown（直接子元素），排除思考块
     extractContent(answerEl) {
       const md = answerEl && answerEl.querySelector(':scope > .ds-markdown');
