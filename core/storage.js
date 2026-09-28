@@ -12,7 +12,11 @@
         },
         async set(obj) { await area.set(obj); },
         onChange(cb) {
-          const listener = changes => cb(changes);
+          // 命名空间级事件回调为 (changes, areaName)；按所属 area 过滤
+          const listener = (changes, changedArea) => {
+            if (areaName && changedArea && changedArea !== areaName) return;
+            cb(changes);
+          };
           const ns = (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) || area.changed;
           ns.addListener(listener);
           return () => ns.removeListener(listener);
