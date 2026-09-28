@@ -3,6 +3,9 @@ import { describe, it, expect } from 'vitest';
 import '../adapters/registry.js';
 import '../adapters/deepseek.js';
 import '../adapters/chatgpt.js';
+import '../adapters/kimi.js';
+import '../adapters/claude.js';
+import '../adapters/gemini.js';
 import { defineAdapterSuite } from './helpers.js';
 
 defineAdapterSuite({
@@ -21,6 +24,28 @@ defineAdapterSuite({
   minAnswers: 3,
   fragments: ['版心', '拉宽'],
   questionFragment: '代码块的宽度',
+});
+
+defineAdapterSuite({
+  adapterId: 'kimi',
+  hostname: 'www.kimi.com',
+  fixture: 'kimi.html',
+  minAnswers: 2,
+  fragments: ['Blue Topaz', 'callout'],
+  questionFragment: 'important',
+});
+
+describe('盲写 adapter 注册与域名匹配（无夹具，真站验收时校准）', () => {
+  it('claude / gemini 均已注册且匹配本域', () => {
+    expect(ChatDeck.getAdapterForHost('claude.ai')?.id).toBe('claude');
+    expect(ChatDeck.getAdapterForHost('gemini.google.com')?.id).toBe('gemini');
+  });
+  it('互不串域', () => {
+    expect(ChatDeck.getAdapterForHost('chatgpt.com')?.id).toBe('chatgpt');
+    expect(ChatDeck.getAdapterForHost('chat.deepseek.com')?.id).toBe('deepseek');
+    expect(ChatDeck.getAdapterForHost('www.kimi.com')?.id).toBe('kimi');
+    expect(ChatDeck.getAdapterForHost('example.org')).toBeNull();
+  });
 });
 
 describe('deepseek renderSource（富渲染收窄到正文 markdown）', () => {
