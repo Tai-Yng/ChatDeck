@@ -32,7 +32,7 @@ chrome.commands?.onCommand?.addListener(command => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    const hit = /^(https:\/\/(chat\.deepseek\.com|chatgpt\.com|chat\.openai\.com|kimi\.com|kimi\.moonshot\.cn|claude\.ai|gemini\.google\.com))\//.test(tab.url);
+    const hit = /^(https:\/\/(chat\.deepseek\.com|chatgpt\.com|chat\.openai\.com|kimi\.com|www\.kimi\.com|kimi\.moonshot\.cn|claude\.ai|gemini\.google\.com))\//.test(tab.url);
     chrome.action.setTitle({ tabId, title: hit ? 'ChatDeck — 本页可用' : 'ChatDeck — 本页不可用' });
   }
 });

@@ -3,7 +3,7 @@ const statusEl = document.getElementById('status');
 const toggleEl = document.getElementById('toggle');
 const debugEl = document.getElementById('debug');
 
-const SUPPORTED = /^(https:\/\/(chat\.deepseek\.com|chatgpt\.com|chat\.openai\.com|kimi\.com|kimi\.moonshot\.cn|claude\.ai|gemini\.google\.com))\//;
+const SUPPORTED = /^(https:\/\/(chat\.deepseek\.com|chatgpt\.com|chat\.openai\.com|kimi\.com|www\.kimi\.com|kimi\.moonshot\.cn|claude\.ai|gemini\.google\.com))\//;
 
 (async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

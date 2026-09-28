@@ -11,7 +11,7 @@ describe('manifest', () => {
       expect(js.some(f => f === `adapters/${p}.js`)).toBe(true);
   });
   it('五主域全部具备 host_permissions 与 matches', () => {
-    const domains = ['chat.deepseek.com', 'chatgpt.com', 'kimi.com', 'claude.ai', 'gemini.google.com'];
+    const domains = ['chat.deepseek.com', 'chatgpt.com', 'kimi.com', 'www.kimi.com', 'claude.ai', 'gemini.google.com'];
     for (const d of domains) {
       expect(manifest.host_permissions.some(p => p.includes(d))).toBe(true);
       expect(manifest.content_scripts[0].matches.some(m => m.includes(d))).toBe(true);

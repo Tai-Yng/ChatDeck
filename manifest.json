@@ -9,6 +9,7 @@
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://kimi.com/*",
+        "https://www.kimi.com/*",
     "https://kimi.moonshot.cn/*",
     "https://claude.ai/*",
     "https://gemini.google.com/*"
@@ -20,6 +21,7 @@
         "https://chatgpt.com/*",
         "https://chat.openai.com/*",
         "https://kimi.com/*",
+        "https://www.kimi.com/*",
         "https://kimi.moonshot.cn/*",
         "https://claude.ai/*",
         "https://gemini.google.com/*"
@@ -56,6 +58,7 @@
         "https://chatgpt.com/*",
         "https://chat.openai.com/*",
         "https://kimi.com/*",
+        "https://www.kimi.com/*",
         "https://kimi.moonshot.cn/*",
         "https://claude.ai/*",
         "https://gemini.google.com/*"
