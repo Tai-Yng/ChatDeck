@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import '../adapters/registry.js';
 import '../adapters/deepseek.js';
+import '../adapters/chatgpt.js';
 import { defineAdapterSuite } from './helpers.js';
 
 defineAdapterSuite({
@@ -11,6 +12,15 @@ defineAdapterSuite({
   minAnswers: 2,
   fragments: ['量子计算发展史', '容错阈值'],
   questionFragment: '量子计算',
+});
+
+defineAdapterSuite({
+  adapterId: 'chatgpt',
+  hostname: 'chatgpt.com',
+  fixture: 'chatgpt.html',
+  minAnswers: 3,
+  fragments: ['版心', '拉宽'],
+  questionFragment: '代码块的宽度',
 });
 
 describe('deepseek renderSource（富渲染收窄到正文 markdown）', () => {

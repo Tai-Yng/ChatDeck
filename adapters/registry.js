@@ -25,8 +25,9 @@
     if (!answerEl) return null;
     const sel = this.selectors && this.selectors.question;
     if (!sel) return null;
+    // 爬层深度 6：ChatGPT 的线程容器嵌套较深（turn > thread > ...），3 层不够
     let container = answerEl.parentElement;
-    for (let i = 0; i < 3 && container; i++) {
+    for (let i = 0; i < 6 && container; i++) {
       const qs = Array.from(container.querySelectorAll(sel));
       const before = qs.filter(q => answerEl.compareDocumentPosition(q) & Node.DOCUMENT_POSITION_PRECEDING);
       if (before.length) return before.at(-1);
