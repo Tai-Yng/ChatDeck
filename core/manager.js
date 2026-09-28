@@ -8,16 +8,17 @@
   class ChatDeckManager {
     constructor(capture, store, adapter) {
       this.capture = capture; this.store = store; this.adapter = adapter;
-      this.visible = true; this._saveT = null;
+      this.visible = true; this._saveT = null; this.enabled = true;
     }
 
     async init() {
       const enabled = await this.store.get('enabled', true);
+      this.enabled = enabled !== false;
       this.pos = await this.store.get('windowPos', { x: 20, y: 20 });
       this.size = await this.store.get('windowSize', { width: 500, height: 650 });
       this._build();
       this._applyTheme();
-      if (!enabled) this.hide();
+      if (!this.enabled) { this.root.style.display = 'none'; this.chip.style.display = 'none'; }
       if (this.capture.o) this.capture.o.onUpdate = () => this.sync();
       this.sync();
     }
@@ -45,6 +46,15 @@
         </div>
         <div class="chatdeck-resize" aria-label="缩放"></div>`;
       document.documentElement.appendChild(this.root);
+
+      // 关闭后的重开入口：右下角悬浮球
+      this.chip = document.createElement('button');
+      this.chip.className = 'chatdeck-chip';
+      this.chip.textContent = '⧉ ChatDeck';
+      this.chip.setAttribute('aria-label', '打开 ChatDeck 悬浮窗');
+      this.chip.style.display = 'none';
+      this.chip.onclick = () => this.show();
+      document.documentElement.appendChild(this.chip);
 
       this.root.querySelector('.chatdeck-close').onclick = () => this.hide();
       this.root.querySelector('.chatdeck-prev').onclick = () => this.prev();
@@ -248,11 +258,19 @@
     next() { this.goTo(this.capture.currentIndex + 1); }
     prev() { this.goTo(this.capture.currentIndex - 1); }
 
-    show() { this.visible = true; this.root.style.display = 'block'; }
-    hide() { this.visible = false; this.root.style.display = 'none'; }
+    show() { this.visible = true; this.root.style.display = 'block'; this.chip.style.display = 'none'; }
+    hide() { this.visible = false; this.root.style.display = 'none'; if (this.enabled) this.chip.style.display = 'block'; }
+
+    // popup「启用」总开关：关 = 窗口与悬浮球都消失；开 = 窗口回来
+    setEnabled(on) {
+      this.enabled = on !== false;
+      if (!this.enabled) { this.visible = false; this.root.style.display = 'none'; this.chip.style.display = 'none'; }
+      else this.show();
+    }
+
     toggle() { this.visible ? this.hide() : this.show(); }
 
-    destroy() { if (this.root) this.root.remove(); clearTimeout(this._saveT); }
+    destroy() { if (this.root) this.root.remove(); if (this.chip) this.chip.remove(); clearTimeout(this._saveT); }
   }
 
   g.ChatDeckManager = ChatDeckManager;

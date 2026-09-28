@@ -36,6 +36,7 @@
     await manager.init();
     capture.start();
     instance = { adapter, capture, manager, store };
+    await watchSettings(store, () => instance);   // 订阅随 boot 装配，测试可达
     return instance;
   }
 
@@ -55,13 +56,20 @@
     }
   }
 
-  // debug 开关同步（popup 切换 → storage 变更 → 生效）
-  async function watchDebug(store) {
+  // 设置订阅：debug 开关生效 + popup「启用」实时显隐窗口
+  async function watchSettings(store, getInstance) {
     ChatDeck.debug = !!(await store.get('debug', false));
     store.onChange(changes => {
-      if (changes && 'debug' in changes) {
+      if (!changes) return;
+      if ('debug' in changes) {
         const v = changes.debug;
         ChatDeck.debug = typeof v === 'object' && v !== null ? !!v.newValue : !!v;
+      }
+      if ('enabled' in changes) {
+        const v = changes.enabled;
+        const on = typeof v === 'object' && v !== null ? !!v.newValue : !!v;
+        const inst = getInstance();
+        if (inst) inst.manager.setEnabled(on);
       }
     });
   }
@@ -69,8 +77,5 @@
   g.chrome?.runtime?.onMessage?.addListener((msg, _s, sendResponse) => handleMessage(msg, sendResponse));
   g.ChatDeckBoot = { boot, handleMessage };
 
-  (async () => {
-    const inst = await boot().catch(e => { ChatDeck.warn('boot 失败', e); return null; });
-    if (inst) watchDebug(inst.store);
-  })();
+  boot().catch(e => ChatDeck.warn('boot 失败', e));
 })();

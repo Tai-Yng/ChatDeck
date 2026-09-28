@@ -41,6 +41,12 @@
     }
   ],
   "background": { "service_worker": "background.js" },
+  "commands": {
+    "toggle-chatdeck": {
+      "suggested_key": { "default": "Alt+Shift+C" },
+      "description": "显示/隐藏 ChatDeck 悬浮窗"
+    }
+  },
   "action": { "default_popup": "popup/popup.html", "default_title": "ChatDeck" },
   "web_accessible_resources": [
     {

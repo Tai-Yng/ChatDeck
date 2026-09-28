@@ -12,10 +12,12 @@ ChatDeck.registerAdapter({
 
 function fakeArea() {
   const data = { enabled: true };
+  const listeners = new Set();
   return {
     get: async key => (key in data ? { [key]: data[key] } : {}),
     set: async o => Object.assign(data, o),
-    changed: { addListener: () => {}, removeListener: () => {} },
+    changed: { addListener: cb => listeners.add(cb), removeListener: cb => listeners.delete(cb) },
+    fire: changes => listeners.forEach(cb => cb(changes)),
     raw: data,
   };
 }
@@ -44,6 +46,16 @@ describe('ChatDeckBoot', () => {
     const status = await new Promise(res => ChatDeckBoot.handleMessage({ action: 'getStatus' }, res));
     expect(status.platform).toBe('Fake');
     expect(status.count).toBe(1);
+  });
+  it('popup 启用开关实时生效：false 隐藏窗口，true 恢复', async () => {
+    const area = fakeArea();
+    document.body.innerHTML = `<div class="q">Q</div><div class="ans">A 内容</div>`;
+    const r = await ChatDeckBoot.boot({ doc: document, storageArea: area, hostname: 'fake.test' });
+    expect(r.manager.root.style.display).not.toBe('none');
+    area.fire({ enabled: { newValue: false } });
+    expect(r.manager.root.style.display).toBe('none');
+    area.fire({ enabled: { newValue: true } });
+    expect(r.manager.root.style.display).toBe('block');
   });
   it('SPA 挂载竞态：shouldActivate 延迟为真 → 宽限期内轮询后激活', async () => {
     vi.useFakeTimers();

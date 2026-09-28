@@ -24,8 +24,9 @@ function fakeCapture() {
 
 beforeEach(() => {
   document.body.innerHTML = '';
-  // manager 将窗口挂载在 documentElement 上，需一并清理防止跨测试泄漏
+  // manager 将窗口与悬浮球挂载在 documentElement 上，需一并清理防止跨测试泄漏
   document.querySelectorAll('.chatdeck-root').forEach(n => n.remove());
+  document.querySelectorAll('.chatdeck-chip').forEach(n => n.remove());
 });
 
 describe('ChatDeckManager', () => {
@@ -138,6 +139,28 @@ describe('ChatDeckManager', () => {
     expect(btn.textContent).toBe('⇡ 收齐历史');
     expect(btn.disabled).toBe(false);
     vi.useRealTimers();
+  });
+  it('× 关闭后出现悬浮球，点击球重新打开窗口', async () => {
+    const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
+    await m.init();
+    const chip = document.querySelector('.chatdeck-chip');
+    expect(chip.style.display).toBe('none');            // 窗口可见时球隐藏
+    document.querySelector('.chatdeck-close').click();
+    expect(m.root.style.display).toBe('none');
+    expect(chip.style.display).toBe('block');           // 关闭后球出现
+    chip.click();
+    expect(m.root.style.display).toBe('block');         // 点球重开
+    expect(chip.style.display).toBe('none');
+  });
+  it('popup 启用总开关：false 全隐（窗口+球），true 恢复窗口', async () => {
+    const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
+    await m.init();
+    m.setEnabled(false);
+    expect(m.root.style.display).toBe('none');
+    expect(document.querySelector('.chatdeck-chip').style.display).toBe('none');
+    m.setEnabled(true);
+    expect(m.root.style.display).toBe('block');
+    expect(document.querySelector('.chatdeck-chip').style.display).toBe('none');
   });
   it('toggle 显隐', async () => {
     const m = new ChatDeckManager(fakeCapture(), fakeStore(), { label: 'Fake' });
