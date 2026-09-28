@@ -24,4 +24,23 @@ describe('ChatDeckStorage', () => {
     await store.set({ enabled: false }); off(); await store.set({ enabled: true });
     expect(seen.length).toBe(1);
   });
+  it('真实 Chrome 形态：订阅命名空间级 chrome.storage.onChanged 并按 area 过滤', async () => {
+    const nsListeners = new Set();
+    globalThis.chrome = { storage: { onChanged: {
+      addListener: cb => nsListeners.add(cb),
+      removeListener: cb => nsListeners.delete(cb),
+    } } };
+    const area = fakeArea();                       // 假对象的 area.changed 应被命名空间级覆盖
+    const store = ChatDeckStorage.create(area, 'sync');
+    const seen = [];
+    const off = store.onChange(v => seen.push(v));
+    expect(nsListeners.size).toBe(1);
+    const fire = [...nsListeners][0];
+    fire({ enabled: { newValue: false } }, 'local');   // 其它 area → 过滤
+    fire({ enabled: { newValue: true } }, 'sync');     // sync → 通过
+    expect(seen.length).toBe(1);
+    off();
+    expect(nsListeners.size).toBe(0);
+    delete globalThis.chrome;
+  });
 });

@@ -28,7 +28,7 @@
     if (!adapter) return null;
     if (!(await waitActivated(adapter, doc))) return null;
 
-    const store = ChatDeckStorage.create(area);
+    const store = ChatDeckStorage.create(area, 'sync');
     if (!(await store.get('enabled', true))) return null;
 
     const capture = new ChatDeckCapture(adapter);
