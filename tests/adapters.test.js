@@ -31,7 +31,7 @@ defineAdapterSuite({
   hostname: 'www.kimi.com',
   fixture: 'kimi.html',
   minAnswers: 2,
-  fragments: ['Blue Topaz', 'callout'],
+  fragments: ['F97352', 'red border'],
   questionFragment: 'important',
 });
 
