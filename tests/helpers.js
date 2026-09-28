@@ -29,7 +29,9 @@ export function defineAdapterSuite({ adapterId, hostname, fixture, minAnswers, f
 
     it('末条回答可提取且含关键片段', () => {
       const els = doc.querySelectorAll(adapter.selectors.answer);
-      const text = ChatDeck.DefaultAdapter.extractContent.call(adapter, els[els.length - 1]);
+      // 与生产一致：优先 adapter 自身的 extractContent（可能排除思考块等）
+      const extract = adapter.extractContent || ChatDeck.DefaultAdapter.extractContent;
+      const text = extract.call(adapter, els[els.length - 1]);
       for (const f of fragments) expect(text).toContain(f);
     });
 
